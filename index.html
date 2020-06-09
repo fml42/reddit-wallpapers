@@ -21,7 +21,17 @@
 			<span class="tooltiptext"><span>Back to last image</span></span>
 		</div>
 		<div class="menuitem menuitemtooltip" onclick="btn('skip')" style="background-image: url(skip.png);">
-			<span class="tooltiptext"><span>New image</span></span>
+			<span class="tooltiptext">
+				<span>
+					New image
+					<span id="multiredditRefreshNote">
+						<br>
+						<br>
+						<i>Re-fetch subreddit list from multireddit feed:</i><br>
+						<button onclick="btn('refreshMulti')" class="clickButton">Refresh now</button> 
+					</span>
+				</span>
+			</span>
 		</div>
 		<div class="menuitem menuitemtooltip tooltipwide" onclick="btn('info')" style="background-image: url(info.png);">
 			<span class="tooltiptext"><span>
@@ -64,6 +74,7 @@
 					<ul>
 						<li>You did not list any subreddits in the wallpaper engine settings</li>
 						<li>The subreddits you listed either don't exist or the recent posts in these subreddits are not images</li>
+						<li>If you're using the multireddit option make sure you provided a valid mutlireddit url (looks like this: https://reddit.com/user/username/m/multiname) and that your multireddit is public!</li>
 					</ul>
 				</div>
 			</div>

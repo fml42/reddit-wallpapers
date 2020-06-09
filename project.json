@@ -10,7 +10,7 @@
 			{
 				"max" : 600,
 				"min" : 5,
-				"order" : 3,
+				"order" : 105,
 				"text" : "<br>Display time (seconds)",
 				"type" : "slider",
 				"value" : 30
@@ -19,32 +19,32 @@
 			{
 				"max" : 3000,
 				"min" : 0,
-				"order" : 14,
+				"order" : 115,
 				"text" : "Transition fade time (ms)",
 				"type" : "slider",
 				"value" : 500
 			},
 			"head1" : 
 			{
-				"order" : 1,
+				"order" : 100,
 				"text" : "<h3>General</h3>",
 				"type" : "text"
 			},
 			"head2" : 
 			{
-				"order" : 5,
+				"order" : 106,
 				"text" : "<h3>Menu Settings</h3>",
 				"type" : "text"
 			},
 			"head3" : 
 			{
-				"order" : 9,
+				"order" : 110,
 				"text" : "<h3>Image Requirements</h3>",
 				"type" : "text"
 			},
 			"head4" : 
 			{
-				"order" : 12,
+				"order" : 113,
 				"text" : "<h3>More</h3>",
 				"type" : "text"
 			},
@@ -89,7 +89,7 @@
 						"value" : 9
 					}
 				],
-				"order" : 13,
+				"order" : 114,
 				"text" : "Load posts from *",
 				"type" : "combo",
 				"value" : 1
@@ -120,7 +120,7 @@
 						"value" : 5
 					}
 				],
-				"order" : 7,
+				"order" : 108,
 				"text" : "Attach to",
 				"type" : "combo",
 				"value" : 1
@@ -130,16 +130,24 @@
 				"condition" : "showmenu.value >= 2",
 				"max" : 100,
 				"min" : 1,
-				"order" : 8,
+				"order" : 109,
 				"text" : "Position (left/right or top/bottom)",
 				"type" : "slider",
 				"value" : 50
+			},
+			"multiredditurl" : 
+			{
+				"condition" : "subselecttype.value==2",
+				"order" : 104,
+				"text" : "multireddit URL (must be public)",
+				"type" : "textinput",
+				"value" : "https://www.reddit.com/user/username/m/multiredditname/"
 			},
 			"postlimit" : 
 			{
 				"max" : 100,
 				"min" : 1,
-				"order" : 15,
+				"order" : 116,
 				"text" : "<br>How many posts to load per subreddit *",
 				"type" : "slider",
 				"value" : 50
@@ -165,14 +173,14 @@
 						"value" : 4
 					}
 				],
-				"order" : 11,
+				"order" : 112,
 				"text" : "Minimum aspect ratio",
 				"type" : "combo",
 				"value" : 2
 			},
 			"requireminres" : 
 			{
-				"order" : 10,
+				"order" : 111,
 				"text" : "Require resolution to be at least screen size",
 				"type" : "bool",
 				"value" : true
@@ -201,21 +209,47 @@
 						"value" : 3
 					}
 				],
-				"order" : 6,
+				"order" : 107,
 				"text" : "Visibility",
 				"type" : "combo",
 				"value" : 2
 			},
 			"subredditlist" : 
 			{
-				"order" : 2,
-				"text" : "Subreddits (comma separated)",
+				"condition" : "subselecttype.value==1",
+				"order" : 103,
+				"text" : "Subreddit list",
 				"type" : "textinput",
 				"value" : "EarthPorn,CityPorn,SkyPorn,LakePorn,VillagePorn,waterporn,wallpaper,wallpapers,WQHD_Wallpaper,minimalisticwalls,MinimalWallpaper,ImaginaryLandscapes,ExposurePorn,naturepapers,naturepics,SpaceWalls,spaceporn,futureporn,ArchitecturePorn"
 			},
+			"subredditlist_info" : 
+			{
+				"condition" : "subselecttype.value==1",
+				"order" : 102,
+				"text" : "<i>select subreddits to display images from by listing them in the text field below, separated by space, comma (,) or plus (+)</i>",
+				"type" : "text"
+			},
+			"subselecttype" : 
+			{
+				"options" : 
+				[
+					{
+						"label" : "List of subreddits",
+						"value" : 1
+					},
+					{
+						"label" : "public multireddit",
+						"value" : 2
+					}
+				],
+				"order" : 101,
+				"text" : "Select subreddits with",
+				"type" : "combo",
+				"value" : 1
+			},
 			"text1" : 
 			{
-				"order" : 16,
+				"order" : 117,
 				"text" : "<br>* <i>re-select wallpaper from the list for this change to take effect</i>",
 				"type" : "text"
 			}
@@ -225,6 +259,7 @@
 	"tags" : [ "Unspecified" ],
 	"title" : "Reddit Wallpapers",
 	"type" : "web",
+	"version" : 0,
 	"visibility" : "public",
 	"workshopid" : "1496601714"
 }

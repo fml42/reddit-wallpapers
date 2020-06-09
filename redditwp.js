@@ -13,6 +13,11 @@ $( document ).ready(function() {
 var ticklength = 1000;
 
 var sublist = [];
+var sublistCsv = null;
+var sublistMulti = null;
+var subselecttype = 1;
+var multiApiUrl = null;
+var refreshMultis = false;
 var imagecount = [];
 var redditdata = [];
 var oddbox = false;
@@ -44,9 +49,21 @@ window.wallpaperPropertyListener = {
 			delay = properties.delaytime.value * 1000;
 		}
 		
+		if (properties.subselecttype) {
+			subselecttype = properties.subselecttype.value;
+			if (subselecttype == 1) {
+				$("#multiredditRefreshNote").hide();
+				if (sublistCsv != null) sublist = sublistCsv;
+			} else if (subselecttype == 2) {
+				$("#multiredditRefreshNote").show();
+				if (sublistMulti != null) sublist = sublistMulti;
+			}
+		}
+		
+		//comma seperated list
 		if (properties.subredditlist) {
 			var subredditlist = properties.subredditlist.value;
-			var sublistarr = subredditlist.split(",").map(function (sub) { return sub.trim(); });
+			var sublistarr = subredditlist.split(/[,\+\s]+/).map(function (sub) { return sub.trim(); });
 			for(var i = 0; i<sublistarr.length; i++) {
 				if (/^\s*$/.test(sublistarr[i])) { //remove empty entries
 					sublistarr.splice(i, 1);
@@ -57,7 +74,18 @@ window.wallpaperPropertyListener = {
 					i--;
 				}
 			}
-			sublist = sublistarr;
+			sublistCsv = sublistarr;
+			if (subselecttype == 1) sublist = sublistCsv;
+		}
+		
+		//personal feed
+		if (properties.multiredditurl) {
+			var multiredditurl = properties.multiredditurl.value.trim().toLowerCase();
+			var multiredditurlmatch = multiredditurl.match(/([a-z\d_-]+)\/m\/([a-z\d\_]+)/i);
+			if (multiredditurlmatch != null) {
+				multiApiUrl = "https://www.reddit.com/api/multi/user/"+multiredditurlmatch[1]+"/m/"+multiredditurlmatch[2];
+			}
+			refreshMultis = true;
 		}
 		
 		if (properties.fadetime) {
@@ -214,9 +242,38 @@ function prevWP() {
 }
 
 function loadFromListRandom() {
+	//if using multireddits, do we need to refresh the sub list?
+	if (subselecttype == 2 && refreshMultis) {
+		refreshMultis = false;
+		if (multiApiUrl == null) {
+			sublist = sublistMulti = [];
+			showError(true);
+		} else {
+			$.ajax({
+				url: multiApiUrl,
+				success: function(data, status) {
+					if (data.data.subreddits) {
+						var newsublist = [];
+						for(var i = 0; i<data.data.subreddits.length; i++) {
+							newsublist.push(data.data.subreddits[i].name);
+						}
+						sublist = sublistMulti = newsublist;
+					} else {
+						sublist = sublistMulti = [];
+					}
+					loadFromListRandom(); //now actually load
+				},
+				error: function(err) {
+					sublist = sublistMulti = [];
+					showError(true);
+				}
+			});
+		}
+		return;
+	}
+	
 	var subredditidx = Math.floor(Math.random()*sublist.length);
 	loadFromSubredditOrFetch(subredditidx, 0);
-	
 }
 
 function loadFromSubredditOrFetch(subredditidx, depth) {
@@ -369,8 +426,8 @@ function btn(id) {
 			nextWP();
 			skipDisabled = true;
 		} 
-	} else if (id == "info") {
-		
+	} else if (id == "refreshMulti") {
+		refreshMultis = true;
 	}
 }
 
