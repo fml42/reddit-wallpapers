@@ -1,0 +1,74 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css">
+  <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+  <script type="text/javascript" src="redditwp.js"></script>
+</head>
+
+<body>
+  <div id="box1" class="box"></div>
+  <div id="box2" class="box"></div>
+  
+  <div class="menubox">
+	<div id="menu" class="menu-horizontal tooltipwrap">
+		<div class="menuitem menuitemtooltip" id="playbutton" onclick="btn('togglePlay')" style="background-image: url(pause.png);">
+			<span class="tooltiptext"><span>Play/Pause slideshow</span></span>
+		</div>
+		<div class="menuitem menuitemtooltip" onclick="btn('back')" style="background-image: url(back.png);">
+			<span class="tooltiptext"><span>Back to last image</span></span>
+		</div>
+		<div class="menuitem menuitemtooltip" onclick="btn('skip')" style="background-image: url(skip.png);">
+			<span class="tooltiptext"><span>New image</span></span>
+		</div>
+		<div class="menuitem menuitemtooltip tooltipwide" onclick="btn('info')" style="background-image: url(info.png);">
+			<span class="tooltiptext"><span>
+				<h1 id="pTitle"></h1>
+				<table>
+					<tr>
+						<td><b id="pSub"></b></td>
+						<td><img class="texticon" src="res.png"/> <span id="pRes"></span></td>
+					</tr>
+					<tr>
+						<td>by <i id="pUser"></i></td>
+						<td id="pDate" class="monospace"></td>
+					</tr>
+					<tr>
+						<td><img class="texticon" src="upvotes.png"/> <span id="pPoints"></span></td>
+						<td><img class="texticon" src="comments.png"/> <span id="pComments"></span></td>
+					</tr>
+				</table>
+				<span class="tag">Image URL</span> <span id="pUrl"></span><br>
+				<span class="tag">Permalink</span> <span id="pLink"></span>
+
+				<br>
+				<button onclick="copyField('pUrlInput')" class="clickButton">Copy Image URL</button> 
+				<button onclick="copyField('pLinkInput')" class="clickButton">Copy Permalink</button> 
+				<input type="text" value="" id="pUrlInput" class="hiddenInput" readonly>
+				<input type="text" value="" id="pLinkInput" class="hiddenInput" readonly>
+				
+			</span></span>
+		</div>
+	</div>
+  </div>
+  
+  <div id="errmsg">
+	  <div class="center1">
+		<div class="center2">
+			<div class="center3">
+				<div class="center4">
+					<h2>No wallpapers could be loaded!</h2>
+					This might be because
+					<ul>
+						<li>You did not list any subreddits in the wallpaper engine settings</li>
+						<li>The subreddits you listed either don't exist or the recent posts in these subreddits are not images</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	  </div>
+  </div>
+</body>
+</html>

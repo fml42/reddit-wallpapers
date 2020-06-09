@@ -1,0 +1,230 @@
+{
+	"contentrating" : "Everyone",
+	"description" : "Fetches images from reddit and displays them as wallpapers. You can specify which subreddits to load pictures from as well as a handful of other useful settings (slideshow speed, transition, etc.). This wallpaper also features a menu bar where you can view infos about the images or skip wallpapers you don't like.\r\n\r\n[img]http://i.imgur.com/dEgdKvj.png[/img]\r\n[h1]Q/A[/h1]\r\n\r\n[b]How do I choose my subreddits?[/b]\r\nBe sure to pick image subreddits. List your subreddits separated by comma and paste this list into [i]General[/i] ► [i]Subreddits[/i] under Properties in the wallpaper engine window. Further down the in the properties you can specify some filters for the images (minimum resolution, minimum aspect ratio).\r\n\r\n[b]How do I hide the menu bar?[/b]\r\nIn the wallpaper engine window on the right side under Properties go to [i]Menu Settings[/i] ► [i]Visibility[/i] and choose [i]None[/i].\r\n\r\n[b]Can you add upvote/downvote buttons to the menu bar?[/b]\r\nNo, this feature was deliberately left out because you'd have to enter your reddit account credentials in the properties of my wallpaper which means trusting a third party application with your login data which is something you should [b]never never ever[/b] do.",
+	"file" : "index.html",
+	"general" : 
+	{
+		"properties" : 
+		{
+			"delaytime" : 
+			{
+				"max" : 600,
+				"min" : 5,
+				"order" : 3,
+				"text" : "<br>Display time (seconds)",
+				"type" : "slider",
+				"value" : 30
+			},
+			"fadetime" : 
+			{
+				"max" : 3000,
+				"min" : 0,
+				"order" : 14,
+				"text" : "Transition fade time (ms)",
+				"type" : "slider",
+				"value" : 500
+			},
+			"head1" : 
+			{
+				"order" : 1,
+				"text" : "<h3>General</h3>",
+				"type" : "text"
+			},
+			"head2" : 
+			{
+				"order" : 5,
+				"text" : "<h3>Menu Settings</h3>",
+				"type" : "text"
+			},
+			"head3" : 
+			{
+				"order" : 9,
+				"text" : "<h3>Image Requirements</h3>",
+				"type" : "text"
+			},
+			"head4" : 
+			{
+				"order" : 12,
+				"text" : "<h3>More</h3>",
+				"type" : "text"
+			},
+			"loadfrom" : 
+			{
+				"options" : 
+				[
+					{
+						"label" : "Hot",
+						"value" : 1
+					},
+					{
+						"label" : "New",
+						"value" : 2
+					},
+					{
+						"label" : "Rising",
+						"value" : 3
+					},
+					{
+						"label" : "Controversial",
+						"value" : 4
+					},
+					{
+						"label" : "Top (last hour)",
+						"value" : 5
+					},
+					{
+						"label" : "Top (last week)",
+						"value" : 6
+					},
+					{
+						"label" : "Top (last month)",
+						"value" : 7
+					},
+					{
+						"label" : "Top (last year)",
+						"value" : 8
+					},
+					{
+						"label" : "Top (all time)",
+						"value" : 9
+					}
+				],
+				"order" : 13,
+				"text" : "Load posts from *",
+				"type" : "combo",
+				"value" : 1
+			},
+			"menuedge" : 
+			{
+				"condition" : "showmenu.value >= 2",
+				"options" : 
+				[
+					{
+						"label" : "Top of screen",
+						"value" : 1
+					},
+					{
+						"label" : "Right of screen",
+						"value" : 2
+					},
+					{
+						"label" : "Very bottom",
+						"value" : 3
+					},
+					{
+						"label" : "Bottom (+taskbar)",
+						"value" : 4
+					},
+					{
+						"label" : "Left of screen",
+						"value" : 5
+					}
+				],
+				"order" : 7,
+				"text" : "Attach to",
+				"type" : "combo",
+				"value" : 1
+			},
+			"menupos" : 
+			{
+				"condition" : "showmenu.value >= 2",
+				"max" : 100,
+				"min" : 1,
+				"order" : 8,
+				"text" : "Position (left/right or top/bottom)",
+				"type" : "slider",
+				"value" : 50
+			},
+			"postlimit" : 
+			{
+				"max" : 100,
+				"min" : 1,
+				"order" : 15,
+				"text" : "<br>How many posts to load per subreddit *",
+				"type" : "slider",
+				"value" : 50
+			},
+			"requireaspectratio" : 
+			{
+				"options" : 
+				[
+					{
+						"label" : "None",
+						"value" : 1
+					},
+					{
+						"label" : "1:1",
+						"value" : 2
+					},
+					{
+						"label" : "4:3",
+						"value" : 3
+					},
+					{
+						"label" : "16:9",
+						"value" : 4
+					}
+				],
+				"order" : 11,
+				"text" : "Minimum aspect ratio",
+				"type" : "combo",
+				"value" : 2
+			},
+			"requireminres" : 
+			{
+				"order" : 10,
+				"text" : "Require resolution to be at least screen size",
+				"type" : "bool",
+				"value" : true
+			},
+			"schemecolor" : 
+			{
+				"order" : 0,
+				"text" : "ui_browse_properties_scheme_color",
+				"type" : "color",
+				"value" : "0 0 0"
+			},
+			"showmenu" : 
+			{
+				"options" : 
+				[
+					{
+						"label" : "Hide",
+						"value" : 1
+					},
+					{
+						"label" : "Show on mouseover",
+						"value" : 2
+					},
+					{
+						"label" : "Show always",
+						"value" : 3
+					}
+				],
+				"order" : 6,
+				"text" : "Visibility",
+				"type" : "combo",
+				"value" : 2
+			},
+			"subredditlist" : 
+			{
+				"order" : 2,
+				"text" : "Subreddits (comma separated)",
+				"type" : "textinput",
+				"value" : "EarthPorn,CityPorn,SkyPorn,LakePorn,VillagePorn,waterporn,wallpaper,wallpapers,WQHD_Wallpaper,minimalisticwalls,MinimalWallpaper,ImaginaryLandscapes,ExposurePorn,naturepapers,naturepics,SpaceWalls,spaceporn,futureporn,ArchitecturePorn"
+			},
+			"text1" : 
+			{
+				"order" : 16,
+				"text" : "<br>* <i>re-select wallpaper from the list for this change to take effect</i>",
+				"type" : "text"
+			}
+		}
+	},
+	"preview" : "preview.png",
+	"tags" : [ "Unspecified" ],
+	"title" : "Reddit Wallpapers",
+	"type" : "web",
+	"visibility" : "public",
+	"workshopid" : "1496601714"
+}
