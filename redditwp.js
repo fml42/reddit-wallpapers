@@ -6,8 +6,26 @@ $( document ).ready(function() {
 	menusize = btnNum*(btnSize+btnPadding) + btnPadding;
 	
 	//for testing in browser only:
-	//sublist = ["earthporn"];
-	//start();
+	/*
+	//sublist = "EarthPorn,CityPorn,SkyPorn,LakePorn,VillagePorn,waterporn,wallpaper,wallpapers,WQHD_Wallpaper,minimalisticwalls,MinimalWallpaper,ImaginaryLandscapes,ExposurePorn,naturepapers,naturepics,SpaceWalls,spaceporn,futureporn,ArchitecturePorn".split(',');
+	sublist = ["EarthPorn"]
+	$("#menu").show();
+	menupos = 0.5;
+	setMenuVertical(false);
+	$("#menu").css("top", 0);
+	$("#menu").css("bottom", "");
+	$("#menu").css("right", "");
+	$(".menuitemtooltip").addClass("tooltip-top");
+	positionMenu();
+	loadmode = 1;
+	//sourceStr = sourceStrList = "r/EarthPorn+CityPorn+SkyPorn";
+	//totallimit = 5;
+	endless = true;
+	sortfrom = "top";
+	appendQS = "&t=day";
+	reloadinterval = 1;
+	start();
+	*/
 });
 
 var ticklength = 1000;
@@ -15,13 +33,19 @@ var ticklength = 1000;
 var sublist = [];
 var sublistCsv = null;
 var sublistMulti = null;
+var sourceStr = "";
+var sourceStrList = null;
+var sourceStrMulti = null;
+
 var subselecttype = 1;
 var multiApiUrl = null;
 var refreshMultis = false;
 var imagecount = [];
+var imagelist = [];
 var redditdata = [];
 var oddbox = false;
 var limit = 50;
+var totallimit = 500;
 var delay = 5000;
 var interval = null;
 var running = false;
@@ -32,6 +56,10 @@ var swidth = 1920;
 var sheight = 1080;
 var sortfrom = "hot";
 var appendQS = "";
+var loadmode = 1;
+var reloadinterval = 0;
+var resetprogress = false;
+var endless = false;
 
 var wpstack = [];
 
@@ -41,6 +69,15 @@ var btnNum = 4;
 var btnPadding = 2;
 var menusize = 0;
 var menuIsVertical = false;
+
+var currentPostId = null;
+var lastQueryLength = 0;
+var lastFetchTime = 0;
+var lastReloadTime = Date.now();
+
+var reset = true;
+
+var stale = false;
 
 var wpPaused = false;
 window.wallpaperPropertyListener = {
@@ -52,11 +89,13 @@ window.wallpaperPropertyListener = {
 		if (properties.subselecttype) {
 			subselecttype = properties.subselecttype.value;
 			if (subselecttype == 1) {
-				$("#multiredditRefreshNote").hide();
+				//$("#multiredditRefreshNote").hide();
 				if (sublistCsv != null) sublist = sublistCsv;
+				if (sourceStrList != null) sourceStr = sourceStrList;
 			} else if (subselecttype == 2) {
-				$("#multiredditRefreshNote").show();
+				//$("#multiredditRefreshNote").show();
 				if (sublistMulti != null) sublist = sublistMulti;
+				if (sourceStrMulti != null) sourceStr = sourceStrMulti;
 			}
 		}
 		
@@ -68,14 +107,17 @@ window.wallpaperPropertyListener = {
 				if (/^\s*$/.test(sublistarr[i])) { //remove empty entries
 					sublistarr.splice(i, 1);
 					i--;
-				}
-				if (!(/^[a-zA-Z\d\_]{1,21}$/.test(sublistarr[i]))) { //remove entries that don't fit the subreddit naming scheme
+				} else if (!(/^[a-zA-Z\d\_]{1,21}$/.test(sublistarr[i]))) { //remove entries that don't fit the subreddit naming scheme
 					sublistarr.splice(i, 1);
 					i--;
 				}
 			}
 			sublistCsv = sublistarr;
-			if (subselecttype == 1) sublist = sublistCsv;
+			sourceStrList = sublistarr.length > 0 ? "r/"+sublistarr.join('+') : "";
+			if (subselecttype == 1) {
+				sublist = sublistCsv;
+				sourceStr = sourceStrList;
+			}
 		}
 		
 		//personal feed
@@ -84,6 +126,8 @@ window.wallpaperPropertyListener = {
 			var multiredditurlmatch = multiredditurl.match(/([a-z\d_-]+)\/m\/([a-z\d\_]+)/i);
 			if (multiredditurlmatch != null) {
 				multiApiUrl = "https://www.reddit.com/api/multi/user/"+multiredditurlmatch[1]+"/m/"+multiredditurlmatch[2];
+				sourceStrMulti = "user/"+multiredditurlmatch[1]+"/m/"+multiredditurlmatch[2];
+				if (subselecttype == 2) sourceStr = sourceStrMulti;
 			}
 			refreshMultis = true;
 		}
@@ -164,7 +208,23 @@ window.wallpaperPropertyListener = {
 			if (val == 4) minaspectratio = 16.0/9.0;
 		}
 		if (properties.postlimit) {
-			//limit = properties.postlimit.value;
+			limit = properties.postlimit.value;
+			reset = true;
+		}
+		if (properties.totallimit) {
+			totallimit = properties.totallimit.value;
+		}
+		if (properties.mode) {
+			loadmode = properties.mode.value;
+		}
+		if (properties.reloadinterval) {
+			reloadinterval = properties.reloadinterval.value;
+		}
+		if (properties.resetprogress) {
+			resetprogress = properties.resetprogress.value;
+		}
+		if (properties.endless) {
+			endless = properties.endless.value;
 		}
 		
 		if (properties.loadfrom) {
@@ -182,6 +242,15 @@ window.wallpaperPropertyListener = {
 			if (val == 7) appendQS = "&t=month";
 			if (val == 8) appendQS = "&t=year";
 			if (val == 9) appendQS = "&t=all";
+			if (val == 10) appendQS = "&t=day";
+			
+			reset = true;
+		}
+		
+		if (subselecttype == 2 && loadmode == 1) {
+			$("#multiredditRefreshNote").show();
+		} else if (subselecttype == 2) {
+			$("#multiredditRefreshNote").hide();
 		}
 		
 		start();
@@ -208,7 +277,7 @@ function positionMenu() {
 function start() {
 	if (!running) {
 		running = true;
-		loadFromListRandom();
+		loadWP();
 		setInterval(tick, ticklength);
 	}
 }
@@ -226,7 +295,7 @@ function tick() {
 }
 
 function nextWP() {
-	loadFromListRandom();
+	loadWP();
 	wpTime = 0;
 }
 
@@ -234,10 +303,113 @@ function prevWP() {
 	if (wpstack.length > 1) {
 		wpstack.pop(); //current
 		var last = wpstack.pop();
-		var img = redditUrlDecode(redditdata[last.sub][last.idx].data.preview.images[0].source.url);
-		//var img = redditdata[last.sub][last.idx].data.url;
-		loadImg(img, last.sub, last.idx);
-		wpTime = 0; //display for the full length
+		post = redditdata[last.sub][last.id];
+		if (post) {
+			loadImg(post);
+			wpTime = 0; //display for the full length
+		}
+	}
+}
+
+function loadWP() {
+	if (reset) {
+		reset = false;
+		imagelist = [];
+		imagecount = [];
+	}
+	
+	if (loadmode == 1) {
+		loadFromListRandom();
+	} else if (loadmode == 2) {
+		loadFromRedditFeed();
+	}
+}
+
+function loadFromRedditFeed() {
+	if (sourceStr && sourceStr != null && sourceStr != "") {
+		imglistkey = sourceStr;
+		var idx = 0;
+		if (imagecount[imglistkey]) idx = imagecount[imglistkey];
+		
+		var loadMore = false;
+		var loadAmt = 25;
+		var empty = false;
+		var after = null;
+		if (imagelist[imglistkey]) {
+			if (imagelist[imglistkey].length == 0) {
+				empty = true;
+			} else {
+				after = "t3_"+imagelist[imglistkey][imagelist[imglistkey].length-1]['id'];
+				if (stale && idx == 0) {
+					//we just wrapped back around and the beginning of the list needs to be reloaded
+					imagecount[imglistkey] = [];
+					loadMore = true;
+					stale = false;
+				}
+			}
+			
+			if (idx >= totallimit && !endless) {
+				//we have reached the end, wrap back around
+				imagecount[imglistkey] = 0;
+				loadFromRedditFeed();
+			} else if (idx >= imagelist[imglistkey].length) {
+				loadMore = true;
+			} else {
+				var succ = loadNextImage(imglistkey, false)
+				if (!succ) {
+					loadMore = true;
+				}
+			}
+		} else {
+			empty = true;
+			loadMore = true;
+		}
+		
+		if (!loadMore && reloadinterval > 0 && Date.now() > lastFetchTime + reloadinterval*60*1000) {
+			console.log("reloading...");
+			loadMore = true;
+			if (currentPostId != null) {
+				imagecount[imglistkey] = 0;
+				imagelist[imglistkey] = [];
+				after = "t3_"+currentPostId;
+				stale = true;
+			}
+			if (resetprogress) {
+				after = null;
+			}
+		}
+		
+		if (loadMore) {
+			redditQuery(sourceStr, imglistkey, loadAmt, after, function() {
+				if (empty && imagelist[imglistkey].length == 0) { 
+					//was empty and still empty => no posts available.
+					showError(true);
+				} else {
+					if (lastQueryLength == 0) {
+						//there are no more posts available, go back to start
+						imagecount[imglistkey] = 0;
+						loadFromRedditFeed();
+					} else if (idx < imagelist[imglistkey].length) {
+						//call again, now that posts are loaded in
+						loadFromRedditFeed();
+					} else {
+						//wtf?
+						showError(true);
+					}
+				}
+			}, function() {
+				//error:
+				if (imagelist[imglistkey].length == 0) { 
+					showError(true); //no posts to show
+				} else {
+					//error loading, work with what we have
+					imagecount[imglistkey] = 0;
+					loadFromRedditFeed();
+				}
+			});
+		}
+	} else {
+		showError(true);
 	}
 }
 
@@ -284,25 +456,58 @@ function loadFromSubredditOrFetch(subredditidx, depth) {
 	
 	subredditidx %= sublist.length;
 	var subreddit = sublist[subredditidx];
-	if (redditdata[subreddit]) {
+	
+	if (reloadinterval > 0 && Date.now() > lastReloadTime + reloadinterval*60*1000) {
+		console.log("reloading...");
+		imagelist = []; //wipe list
+		if (resetprogress) {
+			imagecount = []; //wipe current offsets
+		}
+		lastReloadTime = Date.now();
+	}
+	
+	if (imagelist[subreddit]) {
 		loadFromSubredditOrRetry(subredditidx, depth);
 	} else {
-		/*$.getJSON("https://www.reddit.com/r/"+subreddit+"/hot.json?limit="+limit, function(data, status){
-			redditdata[subreddit] = data.data.children;
+		redditQuery("r/"+subreddit, subreddit, limit, null, function() {
+			//success:
 			loadFromSubredditOrRetry(subredditidx, depth);
-		});*/
-		$.ajax({
-			url: "https://www.reddit.com/r/"+subreddit+"/"+sortfrom+".json?limit="+limit+appendQS,
-			success: function(data, status){
-				redditdata[subreddit] = data.data.children;
-				loadFromSubredditOrRetry(subredditidx, depth);
-			},
-			error: function(err) {
-				//that didn't work, maybe subreddit doesn't exist? try next one...
-				loadFromSubredditOrFetch(subredditidx+1, depth+1);
-			}
+		}, function() {
+			//error:
+			//that didn't work, maybe subreddit doesn't exist? try next one...
+			loadFromSubredditOrFetch(subredditidx+1, depth+1);
 		});
 	}
+}
+
+function redditQuery(feed, imglistkey, lmt, after, fn_success, fn_error) {
+	appendAfter = "";
+	if (after) appendAfter = "&after="+after;
+	qurl = "https://www.reddit.com/"+feed+"/"+sortfrom+".json?limit="+lmt+appendQS+appendAfter;
+	console.log("[apiquery] "+qurl);
+	$.ajax({
+		url: qurl,
+		success: function(response, status){
+			lastQueryLength = response.data.children.length;
+			lastFetchTime = Date.now();
+			for (var i = 0; i<response.data.children.length; i++) {
+				var data = response.data.children[i].data;
+				if (data) {
+					if (!imagelist[imglistkey]) imagelist[imglistkey] = [];
+					imagelist[imglistkey].push({
+						"sub": data.subreddit,
+						"id": data.id,
+					});
+					if (!redditdata[data.subreddit]) redditdata[data.subreddit] = [];
+					redditdata[data.subreddit][data.id] = data;
+				}
+			}
+			fn_success();
+		},
+		error: function(err) {
+			fn_error();
+		}
+	});
 }
 
 function showError(show) {
@@ -311,52 +516,68 @@ function showError(show) {
 
 function loadFromSubredditOrRetry(subredditidx, depth) {
 	var subreddit = sublist[subredditidx];
-	var succ = loadNextImage(subreddit, redditdata[subreddit]);
+	var succ = loadNextImage(subreddit, true);
 	if (!succ) {
 		loadFromSubredditOrFetch(subredditidx+1, depth+1);
 	}
 }
 
-function loadNextImage(subreddit, data) {
-	if (!imagecount[subreddit]) {
-		imagecount[subreddit] = 0;
+function loadNextImage(imglistkey, wrap) {
+	if (!imagecount[imglistkey]) {
+		imagecount[imglistkey] = 0;
 	}
 	
-	var imgNum = 0;
+	var ilist = imagelist[imglistkey];
 	
-	var i = imagecount[subreddit];
-	for(var k = 0; k<data.length; k++) {
-		if (i >= data.length) i = 0;
-		var post = data[i].data;
-		if (post.preview && post.preview.images[0]) {
-			var imgData = post.preview.images[0].source;
-			if ((imgData.width >= swidth && imgData.height >= sheight) || !requireminres) {
-				var aspect = imgData.width/parseFloat(imgData.height);
-				if(aspect >= minaspectratio) {
-					//var img = post.url;
-					var img = redditUrlDecode(imgData.url);
-					loadImg(img,subreddit,i);
-					imagecount[subreddit] = (i+1) % data.length;
-					console.log("showing #"+(i+1)+" from r/"+subreddit);
-					
-					showError(false);
-					return true;
-				} else {
-					console.log("skipping #"+(i+1)+" from r/"+subreddit+" because aspect ratio too low: "+aspect);
-				}
-			} else {
-				console.log("skipping #"+(i+1)+" from r/"+subreddit+" because width or height too low: "+imgData.width+"x"+imgData.height);
-			}
+	var i = imagecount[imglistkey];
+	for(var k = 0; k<ilist.length; k++) {
+		if (i >= ilist.length) {
+			if (wrap) i = 0;
+			else return false;
+		} 
+		var post_ptr = ilist[i];
+		var post = redditdata[post_ptr.sub][post_ptr.id];
+		
+		if (post && checkImage(post)) {
+			loadImg(post);
+			imagecount[imglistkey] = wrap ? (i+1) % ilist.length : i+1;
+			console.log("showing #"+(i+1)+" ("+post.id+") from r/"+post.subreddit);
+			showError(false);
+			return true;
 		} else {
-			console.log("skipping #"+(i+1)+" from r/"+subreddit+" because it's not an image post");
+			console.log("skipping #"+(i+1)+" ("+post.id+") from r/"+post.subreddit);
 		}
+		
 		i++;
 	}
 	
 	return false;
 }
 
-function loadImg(img,subreddit,i) {
+function checkImage(post) {
+	if (post.preview && post.preview.images[0]) {
+		var imgData = post.preview.images[0].source;
+		if ((imgData.width >= swidth && imgData.height >= sheight) || !requireminres) {
+			var aspect = imgData.width/parseFloat(imgData.height);
+			if(aspect >= minaspectratio) {
+				return true;
+			} else {
+				console.log(post.subreddit+":"+post.id+": aspect ratio too low: "+aspect);
+			}
+		} else {
+			console.log(post.subreddit+":"+post.id+": width or height too low: "+imgData.width+"x"+imgData.height);
+		}
+	} else {
+		console.log(post.subreddit+":"+post.id+": not an image post");
+	}
+	return false;
+}
+
+function loadImg(post) {
+	
+	var imgData = post.preview.images[0].source;
+	var img = redditUrlDecode(imgData.url);
+	
 	$('<img/>').attr('src', img).on('load', function() {
 		$(this).remove();
 		$("#box"+(oddbox?2:1)).css("background-image",'url('+img+')');
@@ -372,10 +593,11 @@ function loadImg(img,subreddit,i) {
 			});
 		}
 		wpstack.push({
-			"sub": subreddit,
-			"idx": i
+			"sub": post.subreddit,
+			"id": post.id
 		});
-		loadInfo(redditdata[subreddit][i].data);
+		currentPostId = post.id;
+		loadInfo(post);
 		oddbox = !oddbox;
 	});
 }

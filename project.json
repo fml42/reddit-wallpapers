@@ -73,6 +73,10 @@
 						"value" : 5
 					},
 					{
+						"label" : "Top (last day)",
+						"value" : 10
+					},
+					{
 						"label" : "Top (last week)",
 						"value" : 6
 					},
@@ -90,7 +94,7 @@
 					}
 				],
 				"order" : 114,
-				"text" : "Load posts from *",
+				"text" : "Load posts from",
 				"type" : "combo",
 				"value" : 1
 			},
@@ -143,15 +147,6 @@
 				"type" : "textinput",
 				"value" : "https://www.reddit.com/user/username/m/multiredditname/"
 			},
-			"postlimit" : 
-			{
-				"max" : 100,
-				"min" : 1,
-				"order" : 116,
-				"text" : "<br>How many posts to load per subreddit *",
-				"type" : "slider",
-				"value" : 50
-			},
 			"requireaspectratio" : 
 			{
 				"options" : 
@@ -184,13 +179,6 @@
 				"text" : "Require resolution to be at least screen size",
 				"type" : "bool",
 				"value" : true
-			},
-			"schemecolor" : 
-			{
-				"order" : 0,
-				"text" : "ui_browse_properties_scheme_color",
-				"type" : "color",
-				"value" : "0 0 0"
 			},
 			"showmenu" : 
 			{
@@ -247,11 +235,93 @@
 				"type" : "combo",
 				"value" : 1
 			},
-			"text1" : 
+			"mode" : 
 			{
-				"order" : 117,
-				"text" : "<br>* <i>re-select wallpaper from the list for this change to take effect</i>",
-				"type" : "text"
+				"options" : 
+				[
+					{
+						"label" : "Load specified amount of images separately for each sub, then pick subs at random to get next image from",
+						"value" : 1
+					},
+					{
+						"label" : "Let reddit sort (based on 'load posts from' setting)",
+						"value" : 2
+					}
+				],
+				"order" : 120,
+				"text" : "Load Mode",
+				"type" : "combo",
+				"value" : 2
+			},
+			"totallimit" : 
+			{
+				"max" : 2000,
+				"min" : 10,
+				"order" : 121,
+				"text" : "<br>Max number of posts to load before looping back around to the start",
+				"type" : "slider",
+				"value" : 500,
+				"condition" : "mode.value==2 && endless.value==false"
+			},
+			"endless" : 
+			{
+				"order" : 122,
+				"text" : "Endless mode (continue loading posts until reddit returns no more)",
+				"type" : "bool",
+				"value" : false,
+				"condition" : "mode.value==2"
+			},
+			"postlimit" : 
+			{
+				"max" : 100,
+				"min" : 1,
+				"order" : 123,
+				"text" : "<br>How many posts to load per subreddit",
+				"type" : "slider",
+				"value" : 50,
+				"condition" : "mode.value==1"
+			},
+			"reloadinterval" : 
+			{
+				"options" : 
+				[
+					{
+						"label" : "Never (load once on startup)",
+						"value" : 0
+					},
+					{
+						"label" : "Every 10m",
+						"value" : 10
+					},
+					{
+						"label" : "Every 30m",
+						"value" : 30
+					},
+					{
+						"label" : "Every hour",
+						"value" : 60
+					},
+					{
+						"label" : "Every 12h",
+						"value" : 720
+					},
+					{
+						"label" : "Every 24h",
+						"value" : 1440
+					}
+				],
+				"order" : 124,
+				"text" : "Reload list interval",
+				"type" : "combo",
+				"value" : 60
+			},
+			"resetprogress" : 
+			{
+				"order" : 125,
+				"text" : "Jump back to start of queue when reloading list (effectively resets progress)",
+				"type" : "bool",
+				"value" : false,
+				"condition": "reloadinterval.value>0"
 			}
 		}
 	},

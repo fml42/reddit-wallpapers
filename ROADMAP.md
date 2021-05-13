@@ -1,6 +1,5 @@
 ### TODO/ideas list
 - cache which pictures have been recently shown such that when you change a setting and the wallpaper reloads, you don't have to see pictures you've seen already again before seeing new ones.
-- reload feature such that you don't have to re-select the wallpaper from the list in order for some settings to update
   - reset option for this
 - blocklist / favourite list using localstorage
 	- export options: copy to clipboard
@@ -19,3 +18,6 @@
   - twitter feed
   - livestream status (twitch/mixer) of channels
   - soundcloud/youtube media player
+
+### done
+- reload feature such that you don't have to re-select the wallpaper from the list in order for some settings to update

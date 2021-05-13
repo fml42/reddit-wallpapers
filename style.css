@@ -115,23 +115,27 @@ html, body {
 }
 
 .menuitemtooltip.tooltip-top .tooltiptext {
-	top: 37px;
+	top: 30px;
+	padding-top: 7px;
     left: 50%;
     margin-left: -15px; 
 }
 .menuitemtooltip.tooltip-bottom .tooltiptext {
-	bottom: 37px;
+	bottom: 30px;
+	padding-bottom: 7px;
     left: 50%;
     margin-left: -15px; 
 }
 .menuitemtooltip.tooltip-right .tooltiptext {
 	top: 2px;
-    right: 37px; 
+    right: 30px; 
+	padding-right: 7px;
 	text-align: right;
 }
 .menuitemtooltip.tooltip-left .tooltiptext {
 	top: 2px;
-    left: 37px; 
+    left: 30px; 
+	padding-left: 7px;
 	text-align: left;
 }
 
@@ -148,29 +152,29 @@ html, body {
 }
 
 .menuitemtooltip.tooltip-top .tooltiptext::after {
-    bottom: 100%;
+    top: -3px;
 	left: 15px;
 	border-color: transparent transparent rgba(0,0,0,0.9) transparent;
 	margin-left: -5px;
     border-width: 5px;
 }
 .menuitemtooltip.tooltip-bottom .tooltiptext::after {
-    top: 100%;
+    bottom: -3px;
 	left: 15px;
 	border-color: rgba(0,0,0,0.9) transparent transparent transparent;
 	margin-left: -5px;
     border-width: 5px;
 }
 .menuitemtooltip.tooltip-right .tooltiptext::after {
-	left: 100%;
-    top: 50%;
+	right: -3px;
+    top: 15px;
 	border-color: transparent transparent transparent rgba(0,0,0,0.9);
 	margin-top: -5px;
     border-width: 5px;
 }
 .menuitemtooltip.tooltip-left .tooltiptext::after {
-	right: 100%;
-    top: 50%;
+	left: -3px;
+    top: 15px;
 	border-color: transparent rgba(0,0,0,0.9) transparent transparent;
 	margin-top: -5px;
     border-width: 5px;
